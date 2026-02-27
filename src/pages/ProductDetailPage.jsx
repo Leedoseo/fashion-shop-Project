@@ -4,6 +4,7 @@ import { getProductById } from '../api/products';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import useCart from '../hooks/useCart';
+import useWishlist from '../hooks/useWishlist';
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -13,6 +14,7 @@ const ProductDetailPage = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
+  const { toggleWishlist, isWishlisted } = useWishlist();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -89,8 +91,15 @@ const ProductDetailPage = () => {
             >
               장바구니 담기
             </button>
-            <button className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-              ♡
+            <button
+              onClick={() => toggleWishlist(product)}
+              className={`px-6 py-3 border rounded-lg transition-colors text-xl
+                ${isWishlisted(product.id)
+                  ? 'border-red-400 text-red-500 bg-red-50'
+                  : 'border-gray-300 text-gray-400 hover:bg-gray-50'
+                }`}
+            >
+              {isWishlisted(product.id) ? '♥' : '♡'}
             </button>
           </div>
         </div>
