@@ -30,6 +30,8 @@ const ProductListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentCategory = searchParams.get("category") || "all";
+  
+  const searchFromUrl = searchParams.get('search') || '';
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -48,6 +50,11 @@ const ProductListPage = () => {
     };
     fetchProducts();
   }, [currentCategory]);
+
+  // URL 검색어 동기화
+  useEffect(() => {
+    setSearchQuery(searchFromUrl);
+  }, [searchFromUrl]);
 
   const handleCategoryChange = (category) => {
     if (category === "all") {
