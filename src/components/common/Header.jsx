@@ -3,19 +3,29 @@ import { Link, useNavigate } from "react-router-dom";
 import useCart from "../../hooks/useCart";
 import useWishlist from "../../hooks/useWishlist";
 
+/**
+ * 상단 고정 헤더 컴포넌트 (sticky)
+ *
+ * - 로고, 검색창, 네비게이션(상품목록 / 찜목록 / 장바구니)을 포함
+ * - 찜목록/장바구니 링크에는 현재 개수가 빨간 뱃지로 표시된다
+ * - 모바일에서는 햄버거 버튼으로 접이식 메뉴를 열고 닫는다
+ * - 검색 제출 시 /products?search=검색어 로 이동하고 입력창을 초기화
+ */
 const Header = () => {
-  const { totalCount } = useCart();
-  const { wishlist } = useWishlist();
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { totalCount } = useCart();         // 장바구니 전체 수량 (뱃지 표시용)
+  const { wishlist } = useWishlist();       // 찜 목록 배열 (뱃지 표시용)
+  const [menuOpen, setMenuOpen] = useState(false);    // 모바일 메뉴 열림 상태
+  const [searchQuery, setSearchQuery] = useState(""); // 검색 입력값
   const navigate = useNavigate();
 
+  // 검색 폼 제출 핸들러: 공백만 입력된 경우 무시
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+      // 검색어를 URL 쿼리스트링으로 전달해 ProductListPage에서 필터링
       navigate(`/products?search=${searchQuery.trim()}`);
       setSearchQuery("");
-      setMenuOpen(false);
+      setMenuOpen(false); // 모바일 메뉴가 열려있으면 닫기
     }
   };
 

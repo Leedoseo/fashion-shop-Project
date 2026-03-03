@@ -4,14 +4,21 @@ import ProductCard from '../components/common/ProductCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 
+/**
+ * 쇼핑몰 메인 홈 페이지
+ * 카테고리 바로가기, 베스트 상품(상위 4개), 신상품(5~8번째)을 보여준다
+ * 카테고리 클릭 시 /products?category=카테고리명 으로 이동한다
+ */
 const HomePage = () => {
   const { products, loading, error } = useProducts();
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
 
+  // API 응답 순서 기준: 앞 4개를 베스트, 5~8번째를 신상품으로 사용
   const bestProducts = products.slice(0, 4);
   const newProducts = products.slice(4, 8);
+  // 중복 없는 카테고리 목록 추출
   const categories = [...new Set(products.map((p) => p.category))];
 
   return (

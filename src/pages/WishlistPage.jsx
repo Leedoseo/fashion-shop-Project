@@ -2,10 +2,20 @@ import { Link } from "react-router-dom";
 import useWishlist from "../hooks/useWishlist";
 import useCart from "../hooks/useCart";
 
+/**
+ * 찜 목록 페이지 (/wishlist)
+ * 찜한 상품을 그리드 형태로 나열한다
+ *
+ * - 상품 카드 클릭 시 상품 상세 페이지로 이동
+ * - "장바구니" 버튼으로 해당 상품을 수량 1로 장바구니에 추가
+ * - ✕ 버튼으로 찜 목록에서 삭제
+ * - 찜 목록이 비어있으면 빈 상태 안내와 "쇼핑 계속하기" 버튼을 표시
+ */
 const WishlistPage = () => {
   const { wishlist, removeFromWishlist } = useWishlist();
   const { addToCart } = useCart();
 
+  // 찜 목록이 비어있으면 빈 상태 화면 표시
   if (wishlist.length === 0) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-20 text-center">

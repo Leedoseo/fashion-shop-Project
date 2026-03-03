@@ -7,11 +7,19 @@ import useCart from "../hooks/useCart";
 import useWishlist from "../hooks/useWishlist";
 import useToast from "../hooks/useToast";
 
+/**
+ * 상품 상세 페이지 (/products/:id)
+ * URL 파라미터의 id로 단일 상품 데이터를 불러와 이미지, 정보, 리뷰 평점을 표시한다
+ *
+ * - 수량 선택 후 "장바구니 담기" 버튼으로 장바구니에 추가 (토스트 알림 포함)
+ * - 하트 버튼으로 찜 상태를 토글 (찜 추가/삭제 시 각각 토스트 알림 표시)
+ * - 뒤로가기 버튼: navigate(-1)로 이전 페이지로 복귀
+ */
 const ProductDetailPage = () => {
-  const { id } = useParams();
+  const { id } = useParams();          // URL 파라미터에서 상품 ID 추출
   const navigate = useNavigate();
   const { product, loading, error } = useProduct(id);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(1); // 장바구니 담을 수량 (최소 1)
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
   const { showToast } = useToast();
@@ -19,11 +27,14 @@ const ProductDetailPage = () => {
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
 
+  // 선택한 수량과 함께 장바구니에 추가하고 토스트 알림 표시
   const handleAddToCart = () => {
     addToCart(product, quantity);
     showToast("장바구니에 추가됐습니다 🛒");
   };
 
+  // 찜 상태 토글 후 현재 상태에 맞는 토스트 메시지 표시
+  // toggleWishlist 호출 전 isWishlisted로 현재 상태를 먼저 확인
   const handleToggleWishlist = () => {
     toggleWishlist(product);
     if (isWishlisted(product.id)) {
@@ -68,6 +79,7 @@ const ProductDetailPage = () => {
           <div className="flex items-center gap-4">
             <span className="text-gray-700 font-medium">수량</span>
             <div className="flex items-center border rounded-lg overflow-hidden">
+              {/* Math.max(1, q-1)로 수량이 1 미만으로 내려가지 않도록 방지 */}
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors text-lg"

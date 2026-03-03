@@ -1,9 +1,19 @@
 import { Link } from 'react-router-dom';
 import useCart from '../hooks/useCart';
 
+/**
+ * 장바구니 페이지 (/cart)
+ * 담긴 상품 목록과 우측 주문 요약(금액, 배송비, 합계)을 함께 보여준다
+ *
+ * - 수량 +/- 버튼으로 개별 상품 수량 조절 (1 미만 방지는 CartContext에서 처리)
+ * - ✕ 버튼으로 해당 상품을 장바구니에서 삭제
+ * - 장바구니가 비어있으면 빈 상태 안내와 "쇼핑 계속하기" 버튼을 표시
+ * - "주문하기" 버튼으로 /order 페이지로 이동
+ */
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, totalPrice } = useCart();
 
+  // 장바구니가 비어있으면 빈 상태 화면 표시
   if (cartItems.length === 0) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-20 text-center">

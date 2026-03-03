@@ -2,29 +2,42 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useCart from "../hooks/useCart";
 
+/**
+ * 주문/결제 페이지 (/order)
+ * 배송지 정보 입력, 결제 수단 선택, 주문 상품 요약을 포함한 주문 폼을 제공한다
+ *
+ * - 폼 제출 시 실제 결제 없이 orderComplete 상태를 true로 전환하고 장바구니를 비운다
+ * - orderComplete가 true이면 주문 완료 화면으로 전환
+ * - 장바구니가 비어있는 상태로 접근하면 빈 상태 안내 화면을 표시
+ *   (단, 주문 완료 직후 clearCart로 비워진 경우는 완료 화면을 유지)
+ */
 const OrderPage = () => {
   const navigate = useNavigate();
   const { cartItems, totalPrice, clearCart } = useCart();
   const [orderComplete, setOrderComplete] = useState(false);
+  // 배송지 및 결제 수단 입력 폼 상태
   const [form, setForm] = useState({
     name: "",
     phone: "",
     address: "",
     detailAddress: "",
-    paymentMethod: "card",
+    paymentMethod: "card", // 기본 결제 수단: 신용/체크카드
   });
 
+  // 입력 필드 변경 시 name 속성을 키로 사용해 form state를 일괄 업데이트
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // 주문 제출: 장바구니를 비우고 주문 완료 상태로 전환
   const handleSubmit = (e) => {
     e.preventDefault();
     setOrderComplete(true);
     clearCart();
   };
 
+  // 장바구니가 비어있고 주문 완료 상태도 아닌 경우 (잘못된 접근)
   if (cartItems.length === 0 && !orderComplete) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-20 text-center">

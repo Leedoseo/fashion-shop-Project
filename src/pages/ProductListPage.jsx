@@ -5,6 +5,7 @@ import ProductCard from "../components/common/ProductCard";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorMessage from "../components/common/ErrorMessage";
 
+// 상단 필터 버튼에 표시할 카테고리 목록 (FakeStore API 카테고리와 일치)
 const CATEGORIES = [
   "all",
   "men's clothing",
@@ -13,6 +14,7 @@ const CATEGORIES = [
   "electronics",
 ];
 
+// 정렬 드롭다운에 표시할 옵션 목록
 const SORT_OPTIONS = [
   { value: "default", label: "기본순" },
   { value: "price_asc", label: "가격 낮은순" },
@@ -20,20 +22,30 @@ const SORT_OPTIONS = [
   { value: "rating", label: "인기순" },
 ];
 
+/**
+ * 상품 목록 페이지
+ * URL 쿼리스트링(category, search)을 기반으로 상품을 불러오고,
+ * 검색어 / 가격 범위 / 정렬을 클라이언트 사이드에서 추가 필터링한다
+ *
+ * - ?category=electronics  → 전자제품만 표시
+ * - ?search=jacket         → "jacket"이 포함된 상품만 표시
+ * - 카테고리 변경 시 URL 쿼리스트링을 업데이트해 상태를 URL에 동기화
+ */
 const ProductListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentCategory = searchParams.get("category") || "all";
-  const searchFromUrl = searchParams.get("search") || "";
+  const currentCategory = searchParams.get("category") || "all"; // URL에서 카테고리 읽기
+  const searchFromUrl = searchParams.get("search") || "";         // URL에서 검색어 읽기
   const { products, loading, error } = useProducts(currentCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
 
-  // URL 검색어 동기화
+  // Header 검색창에서 넘어온 URL 검색어를 로컬 state에 반영
   useEffect(() => {
     setSearchQuery(searchFromUrl);
   }, [searchFromUrl]);
 
+  // 카테고리 버튼 클릭 시 URL 쿼리스트링 업데이트 (전체 선택 시 쿼리스트링 제거)
   const handleCategoryChange = (category) => {
     if (category === "all") {
       setSearchParams({});
@@ -42,20 +54,24 @@ const ProductListPage = () => {
     }
   };
 
-  // 검색 + 필터 + 정렬 적용
+  // 검색어 · 가격 범위 · 정렬 옵션을 한 번에 적용
+  // 의존값이 바뀔 때만 재계산 (useMemo로 성능 최적화)
   const filteredProducts = useMemo(() => {
     return products
+      // 1단계: 검색어 필터 (대소문자 무시)
       .filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      // 2단계: 가격 범위 필터 (미입력 시 min=0, max=Infinity로 처리)
       .filter((p) => {
         const min = priceRange.min === "" ? 0 : Number(priceRange.min);
         const max = priceRange.max === "" ? Infinity : Number(priceRange.max);
         return p.price >= min && p.price <= max;
       })
+      // 3단계: 정렬
       .sort((a, b) => {
         if (sortBy === "price_asc") return a.price - b.price;
         if (sortBy === "price_desc") return b.price - a.price;
         if (sortBy === "rating") return b.rating.rate - a.rating.rate;
-        return 0;
+        return 0; // "default"는 API 응답 순서 유지
       });
   }, [products, searchQuery, priceRange, sortBy]);
 
