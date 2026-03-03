@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getProducts, getProductsByCategory } from "../api/products";
+import useProducts from "../hooks/useProducts";
 import ProductCard from "../components/common/ProductCard";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorMessage from "../components/common/ErrorMessage";
@@ -21,35 +21,15 @@ const SORT_OPTIONS = [
 ];
 
 const ProductListPage = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [searchParams, setSearchParams] = useSearchParams();
+  const { products, loading, error } = useProducts(currentCategory);
 
   const currentCategory = searchParams.get("category") || "all";
 
   const searchFromUrl = searchParams.get("search") || "";
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const data =
-          currentCategory === "all"
-            ? await getProducts()
-            : await getProductsByCategory(currentCategory);
-        setProducts(data);
-      } catch {
-        setError("상품을 불러오는데 실패했습니다.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, [currentCategory]);
 
   // URL 검색어 동기화
   useEffect(() => {
@@ -66,22 +46,20 @@ const ProductListPage = () => {
 
   // 검색 + 필터 + 정렬 적용
   const filteredProducts = useMemo(() => {
-  return products
-    .filter((p) =>
-      p.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .filter((p) => {
-      const min = priceRange.min === '' ? 0 : Number(priceRange.min);
-      const max = priceRange.max === '' ? Infinity : Number(priceRange.max);
-      return p.price >= min && p.price <= max;
-    })
-    .sort((a, b) => {
-      if (sortBy === 'price_asc') return a.price - b.price;
-      if (sortBy === 'price_desc') return b.price - a.price;
-      if (sortBy === 'rating') return b.rating.rate - a.rating.rate;
-      return 0;
-    });
-}, [products, searchQuery, priceRange, sortBy]);
+    return products
+      .filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+      .filter((p) => {
+        const min = priceRange.min === "" ? 0 : Number(priceRange.min);
+        const max = priceRange.max === "" ? Infinity : Number(priceRange.max);
+        return p.price >= min && p.price <= max;
+      })
+      .sort((a, b) => {
+        if (sortBy === "price_asc") return a.price - b.price;
+        if (sortBy === "price_desc") return b.price - a.price;
+        if (sortBy === "rating") return b.rating.rate - a.rating.rate;
+        return 0;
+      });
+  }, [products, searchQuery, priceRange, sortBy]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
