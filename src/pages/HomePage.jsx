@@ -1,28 +1,11 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getProducts } from '../api/products';
+import useProducts from '../hooks/useProducts';
 import ProductCard from '../components/common/ProductCard';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 
 const HomePage = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch {
-        setError('상품을 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const { products, loading, error } = useProducts();
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
@@ -33,8 +16,6 @@ const HomePage = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
-
-      {/* 카테고리 바로가기 */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold text-gray-800 mb-6">카테고리</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -50,7 +31,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 베스트 상품 */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">베스트 상품</h2>
@@ -65,7 +45,6 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* 신상품 */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold text-gray-800">신상품</h2>
@@ -79,7 +58,6 @@ const HomePage = () => {
           ))}
         </div>
       </section>
-
     </div>
   );
 };
