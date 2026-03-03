@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import useProduct from '../hooks/useProduct';
-import LoadingSpinner from '../components/common/LoadingSpinner';
-import ErrorMessage from '../components/common/ErrorMessage';
-import useCart from '../hooks/useCart';
-import useWishlist from '../hooks/useWishlist';
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import useProduct from "../hooks/useProduct";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorMessage from "../components/common/ErrorMessage";
+import useCart from "../hooks/useCart";
+import useWishlist from "../hooks/useWishlist";
+import useToast from "../hooks/useToast";
 
 const ProductDetailPage = () => {
   const { id } = useParams();
@@ -13,9 +14,24 @@ const ProductDetailPage = () => {
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
+  const { showToast } = useToast();
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    showToast("장바구니에 추가됐습니다 🛒");
+  };
+
+  const handleToggleWishlist = () => {
+    toggleWishlist(product);
+    if (isWishlisted(product.id)) {
+      showToast("찜 목록에서 삭제됐습니다");
+    } else {
+      showToast("찜 목록에 추가됐습니다 ❤️");
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
@@ -58,7 +74,9 @@ const ProductDetailPage = () => {
               >
                 -
               </button>
-              <span className="px-6 py-2 text-gray-800 font-medium">{quantity}</span>
+              <span className="px-6 py-2 text-gray-800 font-medium">
+                {quantity}
+              </span>
               <button
                 onClick={() => setQuantity((q) => q + 1)}
                 className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition-colors text-lg"
@@ -70,20 +88,21 @@ const ProductDetailPage = () => {
 
           <div className="flex gap-3 mt-4">
             <button
-              onClick={() => addToCart(product, quantity)}
+              onClick={handleAddToCart}
               className="flex-1 bg-gray-800 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors font-medium"
             >
               장바구니 담기
             </button>
             <button
-              onClick={() => toggleWishlist(product)}
+              onClick={handleToggleWishlist}
               className={`px-6 py-3 border rounded-lg transition-colors text-xl
-                ${isWishlisted(product.id)
-                  ? 'border-red-400 text-red-500 bg-red-50'
-                  : 'border-gray-300 text-gray-400 hover:bg-gray-50'
+                ${
+                  isWishlisted(product.id)
+                    ? "border-red-400 text-red-500 bg-red-50"
+                    : "border-gray-300 text-gray-400 hover:bg-gray-50"
                 }`}
             >
-              {isWishlisted(product.id) ? '♥' : '♡'}
+              {isWishlisted(product.id) ? "♥" : "♡"}
             </button>
           </div>
         </div>

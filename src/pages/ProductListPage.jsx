@@ -21,16 +21,14 @@ const SORT_OPTIONS = [
 ];
 
 const ProductListPage = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentCategory = searchParams.get("category") || "all";
+  const searchFromUrl = searchParams.get("search") || "";
+  const { products, loading, error } = useProducts(currentCategory);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { products, loading, error } = useProducts(currentCategory);
-
-  const currentCategory = searchParams.get("category") || "all";
-
-  const searchFromUrl = searchParams.get("search") || "";
-
+  
   // URL 검색어 동기화
   useEffect(() => {
     setSearchQuery(searchFromUrl);
