@@ -45,4 +45,18 @@ src/
 
 ## 📷 스크린샷
 
-> 추후 배포 후 스크린샷 추가 예정
+| 홈 페이지 | 상품 목록 |
+|-----------|-----------|
+| ![홈](public/screenshots/1.png) | ![상품목록](public/screenshots/2.png) |
+
+| 상품 상세 | 장바구니 |
+|-----------|----------|
+| ![상세](public/screenshots/3.png) | ![장바구니](public/screenshots/4.png) |
+
+| 찜 목록 | 주문 페이지 |
+|---------|------------|
+| ![찜](public/screenshots/5.png) | ![주문](public/screenshots/6.png) |
+
+| 주문 완료 |
+|--------|
+| ![주문 완료](public/screenshots/7.png) |
