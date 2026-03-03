@@ -28,7 +28,7 @@ const ProductListPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  
+
   // URL 검색어 동기화
   useEffect(() => {
     setSearchQuery(searchFromUrl);

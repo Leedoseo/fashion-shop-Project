@@ -44,6 +44,38 @@ src/
 └── utils/        # 유틸리티 함수
 ```
 
+## 🔧 트러블슈팅
+
+### 1. Vite Fast Refresh 경고
+
+**문제**
+`CartContext.jsx`에서 `CartProvider`(컴포넌트)와 `useCart`(훅)를 같이 export하자
+`Fast Refresh only works when a file only exports components` 경고 발생
+
+**원인**
+Vite의 Fast Refresh는 컴포넌트만 export하는 파일에서만 정상 작동
+
+**해결**
+
+- `cartContext.js` - Context만 분리
+- `hooks/useCart.js` - 훅만 분리
+- `CartContext.jsx` - Provider 컴포넌트만 export
+
+---
+
+### 2. ProductListPage 초기화 전 접근 에러
+
+**문제**
+상품 목록 페이지 접근 시 흰 화면과 함께 ErrorBoundary 작동
+`ReferenceError: Cannot access 'currentCategory' before initialization`
+
+**원인**
+JS의 TDZ(Temporal Dead Zone) - `const`로 선언된 변수는 선언 전에 접근 불가
+`searchParams` 선언 전에 `currentCategory`에서 `searchParams.get()`을 호출하고 있었음
+
+**해결**
+`searchParams` → `currentCategory` → `useProducts` 순서로 선언 순서 변경
+
 ## 📷 스크린샷
 
 | 홈 페이지                       | 상품 목록                             |
@@ -63,4 +95,5 @@ src/
 | ![주문 완료](public/screenshots/7.png) |
 
 ## 🔗 배포 링크
+
 [Fashion Shop 바로가기](https://fashion-shop-project-tau.vercel.app/)
