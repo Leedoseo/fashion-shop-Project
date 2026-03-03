@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getProductById } from '../api/products';
+import useProduct from '../hooks/useProduct';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import ErrorMessage from '../components/common/ErrorMessage';
 import useCart from '../hooks/useCart';
@@ -9,26 +9,10 @@ import useWishlist from '../hooks/useWishlist';
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { product, loading, error } = useProduct(id);
   const [quantity, setQuantity] = useState(1);
   const { addToCart } = useCart();
   const { toggleWishlist, isWishlisted } = useWishlist();
-
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const data = await getProductById(id);
-        setProduct(data);
-      } catch {
-        setError('상품을 불러오는데 실패했습니다.');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProduct();
-  }, [id]);
 
   if (loading) return <LoadingSpinner />;
   if (error) return <ErrorMessage message={error} />;
