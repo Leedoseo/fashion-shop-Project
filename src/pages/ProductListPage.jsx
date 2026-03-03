@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getProducts, getProductsByCategory } from "../api/products";
 import ProductCard from "../components/common/ProductCard";
@@ -30,8 +30,8 @@ const ProductListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const currentCategory = searchParams.get("category") || "all";
-  
-  const searchFromUrl = searchParams.get('search') || '';
+
+  const searchFromUrl = searchParams.get("search") || "";
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -65,19 +65,23 @@ const ProductListPage = () => {
   };
 
   // 검색 + 필터 + 정렬 적용
-  const filteredProducts = products
-    .filter((p) => p.title.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredProducts = useMemo(() => {
+  return products
+    .filter((p) =>
+      p.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     .filter((p) => {
-      const min = priceRange.min === "" ? 0 : Number(priceRange.min);
-      const max = priceRange.max === "" ? Infinity : Number(priceRange.max);
+      const min = priceRange.min === '' ? 0 : Number(priceRange.min);
+      const max = priceRange.max === '' ? Infinity : Number(priceRange.max);
       return p.price >= min && p.price <= max;
     })
     .sort((a, b) => {
-      if (sortBy === "price_asc") return a.price - b.price;
-      if (sortBy === "price_desc") return b.price - a.price;
-      if (sortBy === "rating") return b.rating.rate - a.rating.rate;
+      if (sortBy === 'price_asc') return a.price - b.price;
+      if (sortBy === 'price_desc') return b.price - a.price;
+      if (sortBy === 'rating') return b.rating.rate - a.rating.rate;
       return 0;
     });
+}, [products, searchQuery, priceRange, sortBy]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
